@@ -2,7 +2,9 @@
 
 extern crate alloc;
 
-pub mod data;
+mod data;
 mod erc20;
 
-pub use erc20::ERC20;
+pub use erc20::{
+    allowance, approve, balance_of, init, mint, total_supply, transfer, transfer_from,
+};

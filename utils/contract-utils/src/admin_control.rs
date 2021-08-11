@@ -4,34 +4,32 @@ use casper_contract::{
 };
 use casper_types::{ApiError, Key};
 
-use crate::{ContractContext, Dict};
+use crate::{contract_context, Dict};
 
 const ADMINS_DICT: &str = "admins";
 
-pub trait AdminControl: ContractContext {
-    fn init(&mut self) {
-        Admins::init();
-    }
+pub fn init() {
+    Admins::init();
+}
 
-    fn add_admin(&mut self, address: Key) {
-        self.assert_caller_is_admin();
-        self.add_admin_without_checked(address);
-    }
+pub fn add_admin(address: Key) {
+    assert_caller_is_admin();
+    add_admin_without_check(address);
+}
 
-    fn disable_admin(&mut self, address: Key) {
-        self.assert_caller_is_admin();
-        Admins::instance().disable_admin(&address);
-    }
+pub fn disable_admin(address: Key) {
+    assert_caller_is_admin();
+    Admins::instance().disable_admin(&address);
+}
 
-    fn add_admin_without_checked(&mut self, address: Key) {
-        Admins::instance().add_admin(&address);
-    }
+pub fn add_admin_without_check(address: Key) {
+    Admins::instance().add_admin(&address);
+}
 
-    fn assert_caller_is_admin(&self) {
-        let caller = self.get_caller();
-        if !Admins::instance().is_admin(&caller) {
-            runtime::revert(ApiError::User(20));
-        }
+fn assert_caller_is_admin() {
+    let caller = contract_context::get_caller();
+    if !Admins::instance().is_admin(&caller) {
+        runtime::revert(ApiError::User(20));
     }
 }
 
@@ -45,6 +43,7 @@ impl Admins {
             dict: Dict::instance(ADMINS_DICT),
         }
     }
+
     pub fn init() {
         storage::new_dictionary(ADMINS_DICT).unwrap_or_revert();
     }
